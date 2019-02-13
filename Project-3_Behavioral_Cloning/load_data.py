@@ -54,13 +54,12 @@ def split_data(test_size=0.2):
 # In[71]:
 
 
-def preprocess_img(img_path):
-    img = cv2.imread(img_path)
+def preprocess_img(img):
     cropped_img = img[range(20, 120), :, :]
     resized_img = cv2.resize(cropped_img, (img_w, img_h), interpolation=cv2.INTER_CUBIC)
     return resized_img.astype('float32')
 
-def load_batch(data, batch_size=batch_size, augment_data=True, bias=0.5):
+def load_batch(data, batch_size=batch_size, augment_data=True, bias=0.8):
     x = np.zeros(shape=(1, img_h, img_w, num_channels), dtype=np.float32)
     y_steer = np.zeros(shape=(1), dtype=np.float32)
     
@@ -81,8 +80,9 @@ def load_batch(data, batch_size=batch_size, augment_data=True, bias=0.5):
         
         if (abs(steer) + bias) < np.random.rand():
             pass
-    
-        img = preprocess_img(img_path)    
+        
+        img = cv2.imread(img_path)
+        img = preprocess_img(img)    
         if augment_data:
             
             if random.choice([True, False]):
@@ -101,7 +101,7 @@ def load_batch(data, batch_size=batch_size, augment_data=True, bias=0.5):
         
     return x[1:], y_steer[1:]
 
-def generator(data, batch_size=batch_size, augment_data=True, bias=0.5):
+def generator(data, batch_size=batch_size, augment_data=True, bias=0.8):
     while True:
         x, y = load_batch(data, batch_size, augment_data, bias)
         yield x, y
